@@ -3,90 +3,54 @@
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
 PatientManager pm = new PatientManager();
+DoctorManager dm = new DoctorManager();
+AppointmentManager am = new AppointmentManager();
+
 DateTime today = DateTime.Today;
 
 pm.Add(new Patient("Тарас", "Ковальчук", today.AddYears(-41), BloodType.APositive, "0501234567"));
 pm.Add(new Patient("Софія", "Мельник", today.AddYears(-33), BloodType.BNegative, "0672345678"));
-pm.Add(new Patient("Андрій", "Шевченко", today.AddYears(-16), BloodType.OPositive, "0933456789"));
-pm.Add(new Patient("Олена", "Бондар"));
 
-Console.WriteLine();
-pm.DisplayAll();
+WorkSchedule morning = new WorkSchedule(8, 16);
+WorkSchedule evening = new WorkSchedule(14, 22);
 
-Console.WriteLine();
-Console.WriteLine("Пошук 'ук':");
-Patient[] found = pm.FindByName("ук");
-foreach (Patient p in found)
+Doctor doc1 = new Doctor("Олександр", "Франко", Speciality.Cardiology, morning, "101");
+Doctor doc2 = new Doctor("Марія", "Лисенко", Speciality.Pediatrics, evening, "102");
+dm.Add(doc1);
+dm.Add(doc2);
+
+Console.WriteLine("\n=== Перевантаження FindBySpeciality ===");
+Doctor[] cardiologistsEnum = dm.FindBySpeciality(Speciality.Cardiology);
+Doctor[] cardiologistsString = dm.FindBySpeciality("кардіо");
+
+Console.WriteLine($"За enum (Cardiology): {cardiologistsEnum.Length}");
+Console.WriteLine($"За рядком ('кардіо'): {cardiologistsString.Length}");
+
+Console.WriteLine("\n=== Перевантаження GetByDate ===");
+am.Add(new Appointment(pm[0]!, doc1, new DateTime(2026, 5, 10, 10, 0, 0)));
+Appointment[] appts1 = am.GetByDate(new DateTime(2026, 5, 10));
+Appointment[] appts2 = am.GetByDate(2026, 5, 10);
+
+Console.WriteLine($"За DateTime: {appts1.Length}");
+Console.WriteLine($"За (2026, 5, 10): {appts2.Length}");
+
+Console.WriteLine("\n=== TryFindById та out ===");
+if (pm.TryFindById(1, out Patient? patient))
 {
-    Console.WriteLine(p);
+    Console.WriteLine($"Знайдено: {patient?.FullName}");
+}
+else
+{
+    Console.WriteLine("Пацієнта не знайдено.");
 }
 
-Console.WriteLine();
-pm.DisplayStats();
+Console.WriteLine("\n=== FindByBloodType ===");
+Patient[] aPositives = pm.FindByBloodType(BloodType.APositive);
+Console.WriteLine($"Пацієнтів з A+: {aPositives.Length}");
 
-Console.WriteLine();
-Console.WriteLine("Видалення ID 2:");
-pm.Remove(2);
-pm.DisplayAll();
+Console.WriteLine("\n=== Оператори ?. та ?? ===");
+string name1 = pm.FindById(1)?.FullName ?? "не знайдено";
+string name2 = pm.FindById(99)?.FullName ?? "не знайдено";
 
-RunPatientMenu(pm);
-
-static void RunPatientMenu(PatientManager manager)
-{
-    while (true)
-    {
-        Console.WriteLine("\n--- Меню «Пацієнти» ---");
-        Console.WriteLine("1. Показати всіх");
-        Console.WriteLine("2. Додати пацієнта");
-        Console.WriteLine("3. Пошук за ім'ям");
-        Console.WriteLine("4. Видалити за ID");
-        Console.WriteLine("5. Статистика");
-        Console.WriteLine("0. Вихід");
-        Console.Write("Ваш вибір: ");
-
-        string? choice = Console.ReadLine();
-        if (choice == "0" || string.IsNullOrEmpty(choice)) break;
-
-        switch (choice)
-        {
-            case "1":
-                manager.DisplayAll();
-                break;
-            case "2":
-                Console.Write("Ім'я: ");
-                string fn = Console.ReadLine() ?? "";
-                Console.Write("Прізвище: ");
-                string ln = Console.ReadLine() ?? "";
-
-                Console.WriteLine("Виберіть групу крові:");
-                Console.WriteLine("0. Unknown, 1. APositive, 2. ANegative, 3. BPositive, 4. BNegative, 5. ABPositive, 6. ABNegative, 7. OPositive, 8. ONegative");
-                Console.Write("Номер: ");
-                int.TryParse(Console.ReadLine(), out int bloodIndex);
-                BloodType bt = (BloodType)bloodIndex;
-
-                Console.Write("Телефон: ");
-                string phone = Console.ReadLine() ?? "0000000000";
-
-                manager.Add(new Patient(fn, ln, DateTime.Today.AddYears(-25), bt, phone));
-                break;
-            case "3":
-                Console.Write("Пошуковий запит: ");
-                string q = Console.ReadLine() ?? "";
-                var res = manager.FindByName(q);
-                if (res.Length == 0) Console.WriteLine("Нікого не знайдено.");
-                else foreach (var p in res) Console.WriteLine(p);
-                break;
-            case "4":
-                Console.Write("ID для видалення: ");
-                if (int.TryParse(Console.ReadLine(), out int id))
-                {
-                    if (manager.Remove(id)) Console.WriteLine("Видалено.");
-                    else Console.WriteLine("Не знайдено.");
-                }
-                break;
-            case "5":
-                manager.DisplayStats();
-                break;
-        }
-    }
-}
+Console.WriteLine($"ID 1: {name1}");
+Console.WriteLine($"ID 99: {name2}");
