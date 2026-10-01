@@ -18,7 +18,7 @@ public class DoctorManager
     {
         if (_count >= MaxDoctors)
         {
-            Console.WriteLine("Помилка: досягнуто ліміту лікарів (50).");
+            Console.WriteLine("РџРѕРјРёР»РєР°: РґРѕСЃСЏРіРЅСѓС‚Рѕ Р»С–РјС–С‚ Р»С–РєР°СЂС–РІ (50).");
             return;
         }
 
@@ -38,14 +38,12 @@ public class DoctorManager
         return null;
     }
 
-    public Doctor[] FindBySpeciality(string speciality)
+    public Doctor[] FindBySpeciality(Speciality speciality)
     {
-        string search = speciality.ToLower();
         int matchCount = 0;
-
         for (int i = 0; i < _count; i++)
         {
-            if (_doctors[i].Speciality.ToLower().Contains(search))
+            if (_doctors[i].Speciality == speciality)
             {
                 matchCount++;
             }
@@ -56,7 +54,35 @@ public class DoctorManager
 
         for (int i = 0; i < _count; i++)
         {
-            if (_doctors[i].Speciality.ToLower().Contains(search))
+            if (_doctors[i].Speciality == speciality)
+            {
+                result[index] = _doctors[i];
+                index++;
+            }
+        }
+
+        return result;
+    }
+
+    public Doctor[] FindBySpeciality(string speciality)
+    {
+        string search = speciality.ToLower();
+        int matchCount = 0;
+
+        for (int i = 0; i < _count; i++)
+        {
+            if (_doctors[i].Speciality.ToString().ToLower().Contains(search))
+            {
+                matchCount++;
+            }
+        }
+
+        Doctor[] result = new Doctor[matchCount];
+        int index = 0;
+
+        for (int i = 0; i < _count; i++)
+        {
+            if (_doctors[i].Speciality.ToString().ToLower().Contains(search))
             {
                 result[index] = _doctors[i];
                 index++;
@@ -99,11 +125,11 @@ public class DoctorManager
         }
 
         _count--;
-        _patientsNull();
+        _doctorsNull();
         return true;
     }
 
-    private void _patientsNull()
+    private void _doctorsNull()
     {
         _doctors[_count] = null!;
     }
@@ -112,11 +138,11 @@ public class DoctorManager
     {
         if (_count == 0)
         {
-            Console.WriteLine("Список лікарів порожній.");
+            Console.WriteLine("РЎРїРёСЃРѕРє Р»С–РєР°СЂС–РІ РїРѕСЂРѕР¶РЅС–Р№.");
             return;
         }
 
-        Console.WriteLine($"=== Лікарі ({_count} / {MaxDoctors}) ===");
+        Console.WriteLine($"=== Р›С–РєР°СЂС– ({_count} / {MaxDoctors}) ===");
         for (int i = 0; i < _count; i++)
         {
             Console.WriteLine(_doctors[i]);
@@ -128,7 +154,7 @@ public class DoctorManager
     {
         if (_count == 0)
         {
-            Console.WriteLine("Статистика недоступна: список порожній.");
+            Console.WriteLine("РЎС‚Р°С‚РёСЃС‚РёРєР° РІС–РґСЃСѓС‚РЅСЏ: РЅРµРјР°С” Р»С–РєР°СЂС–РІ.");
             return;
         }
 
@@ -141,17 +167,17 @@ public class DoctorManager
             }
         }
 
-        Console.WriteLine("=== Статистика лікарів ===");
-        Console.WriteLine($"Всього:         {_count}");
-        Console.WriteLine($"Доступні зараз: {availableNowCount}");
-        Console.WriteLine("По спеціальностях:");
+        Console.WriteLine("=== РЎС‚Р°С‚РёСЃС‚РёРєР° Р»С–РєР°СЂС–РІ ===");
+        Console.WriteLine($"Р’СЃСЊРѕРіРѕ:         {_count}");
+        Console.WriteLine($"Р”РѕСЃС‚СѓРїРЅС– Р·Р°СЂР°Р·: {availableNowCount}");
+        Console.WriteLine("Р—Р° СЃРїРµС†С–Р°Р»СЊРЅРѕСЃС‚СЏРјРё:");
 
         for (int i = 0; i < _count; i++)
         {
             bool isFirst = true;
             for (int j = 0; j < i; j++)
             {
-                if (string.Equals(_doctors[i].Speciality, _doctors[j].Speciality, StringComparison.OrdinalIgnoreCase))
+                if (_doctors[i].Speciality == _doctors[j].Speciality)
                 {
                     isFirst = false;
                     break;
@@ -163,7 +189,7 @@ public class DoctorManager
                 int specCount = 0;
                 for (int k = 0; k < _count; k++)
                 {
-                    if (string.Equals(_doctors[k].Speciality, _doctors[i].Speciality, StringComparison.OrdinalIgnoreCase))
+                    if (_doctors[k].Speciality == _doctors[i].Speciality)
                     {
                         specCount++;
                     }
