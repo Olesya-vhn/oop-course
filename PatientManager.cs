@@ -6,11 +6,15 @@ public class PatientManager
     private Patient[] _patients = new Patient[MaxPatients];
     private int _count = 0;
 
-    public int Count
+    public int Count => _count;
+
+    public Patient? this[int index]
     {
         get
         {
-            return _count;
+            if (index < 0 || index >= _count)
+                return null;
+            return _patients[index];
         }
     }
 
@@ -18,13 +22,13 @@ public class PatientManager
     {
         if (_count >= MaxPatients)
         {
-            Console.WriteLine("Помилка: досягнуто ліміту пацієнтів (100).");
+            Console.WriteLine("РџРѕРјРёР»РєР°: РґРѕСЃСЏРіРЅСѓС‚Рѕ Р»С–РјС–С‚ РїР°С†С–С”РЅС‚С–РІ (100).");
             return;
         }
 
         _patients[_count] = patient;
         _count++;
-        Console.WriteLine($"Пацієнта [{patient.Id}] {patient.FullName} додано.");
+        Console.WriteLine($"РџР°С†С–С”РЅС‚Р° [{patient.Id}] {patient.FullName} РґРѕРґР°РЅРѕ.");
     }
 
     public Patient? FindById(int id)
@@ -37,6 +41,12 @@ public class PatientManager
             }
         }
         return null;
+    }
+
+    public bool TryFindById(int id, out Patient? patient)
+    {
+        patient = FindById(id);
+        return patient != null;
     }
 
     public Patient[] FindByName(string query)
@@ -59,8 +69,32 @@ public class PatientManager
         {
             if (_patients[i].FirstName.ToLower().Contains(q) || _patients[i].LastName.ToLower().Contains(q))
             {
-                result[index] = _patients[i];
-                index++;
+                result[index++] = _patients[i];
+            }
+        }
+
+        return result;
+    }
+
+    public Patient[] FindByBloodType(BloodType bloodType)
+    {
+        int matchCount = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_patients[i].BloodGroup == bloodType)
+            {
+                matchCount++;
+            }
+        }
+
+        Patient[] result = new Patient[matchCount];
+        int index = 0;
+
+        for (int i = 0; i < _count; i++)
+        {
+            if (_patients[i].BloodGroup == bloodType)
+            {
+                result[index++] = _patients[i];
             }
         }
 
@@ -98,11 +132,11 @@ public class PatientManager
     {
         if (_count == 0)
         {
-            Console.WriteLine("порожній список");
+            Console.WriteLine("РЎРїРёСЃРѕРє РїРѕСЂРѕР¶РЅС–Р№.");
             return;
         }
 
-        Console.WriteLine($"=== Пацієнти ({_count} / {MaxPatients}) ===");
+        Console.WriteLine($"=== РџР°С†С–С”РЅС‚Рё ({_count} / {MaxPatients}) ===");
         for (int i = 0; i < _count; i++)
         {
             Console.WriteLine(_patients[i]);
@@ -111,10 +145,10 @@ public class PatientManager
 
     public void DisplayStats()
     {
-        Console.WriteLine("=== Статистика пацієнтів ===");
+        Console.WriteLine("=== РЎС‚Р°С‚РёСЃС‚РёРєР° РїР°С†С–С”РЅС‚С–РІ ===");
         if (_count == 0)
         {
-            Console.WriteLine("порожній список");
+            Console.WriteLine("РЎРїРёСЃРѕРє РїРѕСЂРѕР¶РЅС–Р№.");
             return;
         }
 
@@ -146,10 +180,10 @@ public class PatientManager
 
         double avgAge = (double)totalAge / _count;
 
-        Console.WriteLine($"Всього: {_count}");
-        Console.WriteLine($"Середній вік: {avgAge:F1} р.");
-        Console.WriteLine($"Наймолодший: {_patients[minIdx].FullName} ({_patients[minIdx].Age} р.)");
-        Console.WriteLine($"Найстарший: {_patients[maxIdx].FullName} ({_patients[maxIdx].Age} р.)");
-        Console.WriteLine($"Дорослих: {adultsCount} з {_count}");
+        Console.WriteLine($"РЈСЃСЊРѕРіРѕ: {_count}");
+        Console.WriteLine($"РЎРµСЂРµРґРЅС–Р№ РІС–Рє: {avgAge:F1} СЂ.");
+        Console.WriteLine($"РќР°Р№РјРѕР»РѕРґС€РёР№: {_patients[minIdx].FullName} ({_patients[minIdx].Age} СЂ.)");
+        Console.WriteLine($"РќР°Р№СЃС‚Р°СЂС€РёР№: {_patients[maxIdx].FullName} ({_patients[maxIdx].Age} СЂ.)");
+        Console.WriteLine($"Р”РѕСЂРѕСЃР»С–: {adultsCount} Р· {_count}");
     }
 }

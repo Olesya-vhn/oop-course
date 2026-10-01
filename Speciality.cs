@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace ClinicApp;
 
-namespace ClinicApp
+public enum Speciality
 {
-    internal class Speciality
-    {
-    }
+    General,
+    Cardiology,
+    Neurology,
+    Pediatrics,
+    Surgery,
+    Orthopedics,
+    Dermatology,
+    Emergency
 }
