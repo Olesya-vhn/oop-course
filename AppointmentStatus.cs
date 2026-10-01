@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace ClinicApp;
 
-namespace ClinicApp
+public enum AppointmentStatus
 {
-    internal class AppointmentStatus
-    {
-    }
+    Scheduled,
+    Cancelled,
+    Completed
 }
