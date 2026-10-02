@@ -8,11 +8,15 @@ public class AppointmentManager
     private PatientManager _patients;
     private DoctorManager _doctors;
 
-    public int Count
+    public int Count => _count;
+
+    public Appointment this[int index]
     {
         get
         {
-            return _count;
+            if (index < 0 || index >= _count)
+                return null!;
+            return _appointments[index];
         }
     }
 
@@ -38,21 +42,21 @@ public class AppointmentManager
     {
         if (_count >= MaxAppointments)
         {
-            Console.WriteLine("�������: ��������� ���� ������.");
+            Console.WriteLine("Помилка: досягнуто ліміт записів.");
             return false;
         }
 
         Patient? patient = _patients.FindById(patientId);
         if (patient == null)
         {
-            Console.WriteLine($"�������: �������� � ID {patientId} �� ��������.");
+            Console.WriteLine($"Помилка: пацієнта з ID {patientId} не знайдено.");
             return false;
         }
 
         Doctor? doctor = _doctors.FindById(doctorId);
         if (doctor == null)
         {
-            Console.WriteLine($"�������: ����� � ID {doctorId} �� ��������.");
+            Console.WriteLine($"Помилка: лікаря з ID {doctorId} не знайдено.");
             return false;
         }
 
@@ -183,10 +187,10 @@ public class AppointmentManager
         Patient? patient = _patients.FindById(app.PatientId);
         Doctor? doctor = _doctors.FindById(app.DoctorId);
 
-        string patientName = patient != null ? patient.FullName : $"������� #{app.PatientId}";
-        string doctorName = doctor != null ? doctor.FullName : $"˳��� #{app.DoctorId}";
+        string patientName = patient != null ? patient.FullName : $"Пацієнт #{app.PatientId}";
+        string doctorName = doctor != null ? doctor.FullName : $"Лікар #{app.DoctorId}";
 
-        string line = $"[{app.Id}] {patientName} \u2192 {doctorName} | {app.ScheduledAt:dd.MM.yyyy HH:mm}�{app.EndsAt:HH:mm} | {app.Status}";
+        string line = $"[{app.Id}] {patientName} \u2192 {doctorName} | {app.ScheduledAt:dd.MM.yyyy HH:mm}-{app.EndsAt:HH:mm} | {app.Status}";
         if (app.Notes.Length > 0)
         {
             line += $" | {app.Notes}";
@@ -198,7 +202,7 @@ public class AppointmentManager
     {
         if (list.Length == 0)
         {
-            Console.WriteLine("������ �� ��������.");
+            Console.WriteLine("Записів не знайдено.");
             return;
         }
 

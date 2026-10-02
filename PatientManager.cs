@@ -8,12 +8,12 @@ public class PatientManager
 
     public int Count => _count;
 
-    public Patient? this[int index]
+    public Patient this[int index]
     {
         get
         {
             if (index < 0 || index >= _count)
-                return null;
+                return null!;
             return _patients[index];
         }
     }
@@ -81,7 +81,7 @@ public class PatientManager
         int matchCount = 0;
         for (int i = 0; i < _count; i++)
         {
-            if (_patients[i].BloodGroup == bloodType)
+            if (_patients[i].BloodType == bloodType)
             {
                 matchCount++;
             }
@@ -92,7 +92,7 @@ public class PatientManager
 
         for (int i = 0; i < _count; i++)
         {
-            if (_patients[i].BloodGroup == bloodType)
+            if (_patients[i].BloodType == bloodType)
             {
                 result[index++] = _patients[i];
             }
