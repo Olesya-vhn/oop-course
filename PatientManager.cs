@@ -43,9 +43,9 @@ public class PatientManager
         return null;
     }
 
-    public bool TryFindById(int id, out Patient? patient)
+    public bool TryFindById(int id, out Patient patient)
     {
-        patient = FindById(id);
+        patient = FindById(id)!;
         return patient != null;
     }
 
