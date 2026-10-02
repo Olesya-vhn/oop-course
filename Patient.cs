@@ -8,7 +8,7 @@ public class Patient
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public DateTime BirthDate { get; set; }
-    public BloodType BloodGroup { get; set; }
+    public BloodType BloodType { get; set; }
     public string Phone { get; set; }
 
     public string FullName => $"{FirstName} {LastName}";
@@ -25,13 +25,13 @@ public class Patient
         }
     }
 
-    public Patient(string firstName, string lastName, DateTime birthDate, BloodType bloodGroup, string phone)
+    public Patient(string firstName, string lastName, DateTime birthDate, BloodType bloodType, string phone)
     {
         Id = _nextId++;
         FirstName = firstName;
         LastName = lastName;
         BirthDate = birthDate;
-        BloodGroup = bloodGroup;
+        BloodType = bloodType;
         Phone = phone;
     }
 
@@ -43,7 +43,7 @@ public class Patient
     public override string ToString()
     {
         string ageFormatted = ClinicFormatter.FormatAge(Age);
-        string bloodFormatted = ClinicFormatter.FormatBloodType(BloodGroup);
+        string bloodFormatted = ClinicFormatter.FormatBloodType(BloodType);
         string phoneFormatted = ClinicFormatter.FormatPhone(Phone);
 
         return $"[{Id}] {FullName} ({ageFormatted}) | Група крові: {bloodFormatted} | Тел: {phoneFormatted}";

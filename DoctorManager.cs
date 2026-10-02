@@ -7,12 +7,12 @@ public class DoctorManager
 
     public int Count => _count;
 
-    public Doctor? this[int index]
+    public Doctor this[int index]
     {
         get
         {
             if (index < 0 || index >= _count)
-                return null;
+                return null!;
             return _doctors[index];
         }
     }
@@ -44,9 +44,9 @@ public class DoctorManager
         return null;
     }
 
-    public bool TryFindById(int id, out Doctor? doctor)
+    public bool TryFindById(int id, out Doctor doctor)
     {
-        doctor = FindById(id);
+        doctor = FindById(id)!;
         return doctor != null;
     }
 

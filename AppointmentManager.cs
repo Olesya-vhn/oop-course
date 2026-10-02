@@ -2,42 +2,96 @@ namespace ClinicApp;
 
 public class AppointmentManager
 {
-    private Appointment[] _appointments;
-    private int _count;
+    private const int MaxAppointments = 500;
+    private Appointment[] _appointments = new Appointment[MaxAppointments];
+    private int _count = 0;
+    private PatientManager _patients;
+    private DoctorManager _doctors;
 
     public int Count => _count;
 
-    public Appointment? this[int index]
+    public Appointment this[int index]
     {
         get
         {
             if (index < 0 || index >= _count)
-                return null;
+                return null!;
             return _appointments[index];
         }
     }
 
-    public AppointmentManager(int capacity = 10)
+    public AppointmentManager(PatientManager patientManager, DoctorManager doctorManager)
     {
-        _appointments = new Appointment[capacity];
-        _count = 0;
+        _patients = patientManager;
+        _doctors = doctorManager;
     }
 
-    public void Add(Appointment appointment)
+    private Appointment? FindById(int id)
     {
-        if (_count == _appointments.Length)
+        for (int i = 0; i < _count; i++)
         {
-            Array.Resize(ref _appointments, _appointments.Length * 2);
+            if (_appointments[i].Id == id)
+            {
+                return _appointments[i];
+            }
         }
-        _appointments[_count++] = appointment;
+        return null;
     }
 
-    public Appointment[] GetByDate(DateTime date)
+    public bool Book(int patientId, int doctorId, DateTime scheduledAt, int durationMinutes = 30)
+    {
+        if (_count >= MaxAppointments)
+        {
+            Console.WriteLine("Помилка: досягнуто ліміт записів.");
+            return false;
+        }
+
+        Patient? patient = _patients.FindById(patientId);
+        if (patient == null)
+        {
+            Console.WriteLine($"Помилка: пацієнта з ID {patientId} не знайдено.");
+            return false;
+        }
+
+        Doctor? doctor = _doctors.FindById(doctorId);
+        if (doctor == null)
+        {
+            Console.WriteLine($"Помилка: лікаря з ID {doctorId} не знайдено.");
+            return false;
+        }
+
+        Appointment app = new Appointment(patientId, doctorId, scheduledAt, durationMinutes);
+        _appointments[_count] = app;
+        _count++;
+        return true;
+    }
+
+    public bool Cancel(int id, string reason = "")
+    {
+        Appointment? app = FindById(id);
+        if (app != null && app.Cancel(reason))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public bool Complete(int id)
+    {
+        Appointment? app = FindById(id);
+        if (app != null && app.Complete())
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public Appointment[] GetByPatient(int patientId)
     {
         int matchCount = 0;
         for (int i = 0; i < _count; i++)
         {
-            if (_appointments[i].DateTime.Date == date.Date)
+            if (_appointments[i].PatientId == patientId)
             {
                 matchCount++;
             }
@@ -45,15 +99,62 @@ public class AppointmentManager
 
         Appointment[] result = new Appointment[matchCount];
         int index = 0;
-
         for (int i = 0; i < _count; i++)
         {
-            if (_appointments[i].DateTime.Date == date.Date)
+            if (_appointments[i].PatientId == patientId)
             {
-                result[index++] = _appointments[i];
+                result[index] = _appointments[i];
+                index++;
+            }
+        }
+        return result;
+    }
+
+    public Appointment[] GetByDoctor(int doctorId)
+    {
+        int matchCount = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i].DoctorId == doctorId)
+            {
+                matchCount++;
             }
         }
 
+        Appointment[] result = new Appointment[matchCount];
+        int index = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i].DoctorId == doctorId)
+            {
+                result[index] = _appointments[i];
+                index++;
+            }
+        }
+        return result;
+    }
+
+    public Appointment[] GetByDate(DateTime date)
+    {
+        int matchCount = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i].ScheduledAt.Date == date.Date)
+            {
+                matchCount++;
+            }
+        }
+
+        Appointment[] result = new Appointment[matchCount];
+        int index = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i].ScheduledAt.Date == date.Date)
+            {
+                result[index] = _appointments[i];
+                index++;
+            }
+        }
         return result;
     }
 
@@ -62,40 +163,57 @@ public class AppointmentManager
         return GetByDate(new DateTime(year, month, day));
     }
 
-    public bool Remove(int id)
+    public Appointment[] GetUpcoming()
     {
-        int index = -1;
+        int matchCount = 0;
         for (int i = 0; i < _count; i++)
         {
-            if (_appointments[i].Id == id)
+            if (_appointments[i].IsUpcoming)
             {
-                index = i;
-                break;
+                matchCount++;
             }
         }
 
-        if (index == -1) return false;
-
-        for (int i = index; i < _count - 1; i++)
+        Appointment[] result = new Appointment[matchCount];
+        int index = 0;
+        for (int i = 0; i < _count; i++)
         {
-            _appointments[i] = _appointments[i + 1];
+            if (_appointments[i].IsUpcoming)
+            {
+                result[index] = _appointments[i];
+                index++;
+            }
         }
-
-        _appointments[--_count] = null!;
-        return true;
+        return result;
     }
 
-    public void DisplayAll()
+    public void DisplayAppointment(Appointment app)
     {
-        if (_count == 0)
+        Patient? patient = _patients.FindById(app.PatientId);
+        Doctor? doctor = _doctors.FindById(app.DoctorId);
+
+        string patientName = patient != null ? patient.FullName : $"Пацієнт #{app.PatientId}";
+        string doctorName = doctor != null ? doctor.FullName : $"Лікар #{app.DoctorId}";
+
+        string line = $"[{app.Id}] {patientName} \u2192 {doctorName} | {app.ScheduledAt:dd.MM.yyyy HH:mm}-{app.EndsAt:HH:mm} | {app.Status}";
+        if (app.Notes.Length > 0)
         {
-            Console.WriteLine("Список записів порожній.");
+            line += $" | {app.Notes}";
+        }
+        Console.WriteLine(line);
+    }
+
+    public void DisplayList(Appointment[] list)
+    {
+        if (list.Length == 0)
+        {
+            Console.WriteLine("Записів не знайдено.");
             return;
         }
 
-        for (int i = 0; i < _count; i++)
+        for (int i = 0; i < list.Length; i++)
         {
-            Console.WriteLine(_appointments[i]);
+            DisplayAppointment(list[i]);
         }
     }
 }
