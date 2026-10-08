@@ -45,7 +45,30 @@ else
 
 string unknownName = clinic.Patients.FindById(99)?.FullName ?? "не знайдено";
 Console.WriteLine(unknownName);
+Console.WriteLine("\n=== Демонстрація Задачі 3: валідація ===");
 
+try { new Patient("", "Петренко"); }
+catch (ArgumentException ex) { Console.WriteLine($"Порожнє ім'я: {ex.Message}"); }
+
+try { new Patient("Іван", "Петренко", DateTime.Today.AddDays(1), BloodType.Unknown, "0501234567"); }
+catch (ArgumentOutOfRangeException ex) { Console.WriteLine($"Дата в майбутньому: {ex.Message}"); }
+
+try { new Patient("Іван", "Петренко", DateTime.Today.AddYears(-20), BloodType.Unknown, "05012"); }
+catch (ArgumentException ex) { Console.WriteLine($"Короткий телефон: {ex.Message}"); }
+
+try { new Appointment(1, 1, DateTime.Today.AddHours(10), 0); }
+catch (ArgumentOutOfRangeException ex) { Console.WriteLine($"Тривалість 0: {ex.Message}"); }
+
+try { new WorkSchedule(25, 3); }
+catch (ArgumentOutOfRangeException ex) { Console.WriteLine($"Графік 25-3: {ex.Message}"); }
+
+try { new WorkSchedule(20, 6); }
+catch (ArgumentException ex) { Console.WriteLine($"Графік 20-6: {ex.Message}"); }
+
+try { new Patient("", "А"); } catch (ArgumentException) { }
+try { new Patient("", "Б"); } catch (ArgumentException) { }
+Patient okPatient = new Patient("Марія", "Коваль");
+Console.WriteLine($"Id після двох невдалих спроб: {okPatient.Id} (очікується 6)");
 RunMainMenu(clinic);
 
 static void RunMainMenu(Clinic clinic)
