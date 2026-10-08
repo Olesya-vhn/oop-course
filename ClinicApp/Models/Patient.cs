@@ -10,6 +10,7 @@ public class Patient
     private string _lastName = "";
     private DateTime _birthDate;
     private string _phone = "";
+    private string _email = "";
     public string FullName => $"{FirstName} {LastName}";
 
     public int Id { get; }
@@ -53,7 +54,20 @@ public class Patient
             _phone = value;
         }
     }
-
+    public string Email
+    {
+        get => _email;
+        set
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                _email = "";
+                return;
+            }
+            ClinicValidator.ValidateEmail(value);
+            _email = value;
+        }
+    }
     public BloodType BloodType { get; set; }
 
 
