@@ -9,6 +9,8 @@ public class Doctor
     private string _firstName = "";
     private string _lastName = "";
     private string _roomNumber = "";
+    private string _licenseNumber = "";
+    private string _phone = "";
     public string FullName => $"{FirstName} {LastName}";
 
     public int Id { get; }
@@ -42,22 +44,47 @@ public class Doctor
         set => _roomNumber = value;
     }
 
+
+    public string LicenseNumber
+    {
+        get => _licenseNumber;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentException("Номер ліцензії не може бути порожнім.", nameof(LicenseNumber));
+            _licenseNumber = value;
+        }
+    }
+
+    public string Phone
+    {
+        get => _phone;
+        set
+        {
+            ClinicValidator.ValidatePhone(value);
+            _phone = value;
+        }
+    }
+
     public bool IsAvailableNow => Schedule.IsNow;
 
-    public Doctor(string firstName, string lastName, Speciality speciality, WorkSchedule schedule, string roomNumber)
+    public Doctor(string firstName, string lastName, Speciality speciality, WorkSchedule schedule, string roomNumber, string licenseNumber, string phone)
     {
         FirstName = firstName;
         LastName = lastName;
         Speciality = speciality;
         Schedule = schedule;
         RoomNumber = roomNumber;
+        LicenseNumber = licenseNumber;
+        Phone = phone;
         Id = _nextId++;
     }
 
     public Doctor(string firstName, string lastName)
-        : this(firstName, lastName, Speciality.General, new WorkSchedule(8, 17), "100")
+        : this(firstName, lastName, Speciality.General, new WorkSchedule(8, 17), "100", "000000", "0000000000")
     {
     }
+
 
     public bool CanAcceptAt(int hour)
     {
