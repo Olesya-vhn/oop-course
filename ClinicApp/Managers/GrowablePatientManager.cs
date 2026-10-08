@@ -1,4 +1,5 @@
-namespace ClinicApp;
+using ClinicApp.Models;
+namespace ClinicApp.Managers;
 
 public class GrowablePatientManager
 {
@@ -25,7 +26,7 @@ public class GrowablePatientManager
     {
         int oldCapacity = _patients.Length;
         int newCapacity = oldCapacity * 2;
-        Console.WriteLine($"  Масив заповнений! Розширення: {oldCapacity} \u2192 {newCapacity}");
+        Console.WriteLine($"  РњР°СЃРёРІ Р·Р°РїРѕРІРЅРµРЅРёР№! Р—Р±С–Р»СЊС€РµРЅРЅСЏ: {oldCapacity} \u2192 {newCapacity}");
 
         Patient[] newArray = new Patient[newCapacity];
         for (int i = 0; i < _count; i++)
@@ -90,11 +91,11 @@ public class GrowablePatientManager
     {
         if (_count == 0)
         {
-            Console.WriteLine("Список пацієнтів порожній.");
+            Console.WriteLine("РЎРїРёСЃРѕРє РїР°С†С–С”РЅС‚С–РІ РїРѕСЂРѕР¶РЅС–Р№.");
             return;
         }
 
-        Console.WriteLine($"=== Пацієнти ({_count} / {Capacity}) ===");
+        Console.WriteLine($"=== РџР°С†С–С”РЅС‚Рё ({_count} / {Capacity}) ===");
         for (int i = 0; i < _count; i++)
         {
             Console.WriteLine(_patients[i]);
