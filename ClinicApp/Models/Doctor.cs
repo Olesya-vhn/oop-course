@@ -43,16 +43,27 @@ public class Doctor
         get => _roomNumber;
         set => _roomNumber = value;
     }
+
+
     public string LicenseNumber
     {
         get => _licenseNumber;
-        set => _licenseNumber = value;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentException("Номер ліцензії не може бути порожнім.", nameof(LicenseNumber));
+            _licenseNumber = value;
+        }
     }
 
     public string Phone
     {
         get => _phone;
-        set => _phone = value;
+        set
+        {
+            ClinicValidator.ValidatePhone(value);
+            _phone = value;
+        }
     }
 
     public bool IsAvailableNow => Schedule.IsNow;
