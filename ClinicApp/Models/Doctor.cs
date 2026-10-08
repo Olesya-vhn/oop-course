@@ -18,10 +18,7 @@ public class Doctor
         get => _firstName;
         set
         {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Ім'я не може бути порожнім.", nameof(FirstName));
-            if (value.Length > 50)
-                throw new ArgumentException("Ім'я не може бути довшим за 50 символів.", nameof(FirstName));
+            ClinicValidator.ValidateName(value, nameof(FirstName));
             _firstName = value;
         }
     }
@@ -31,10 +28,7 @@ public class Doctor
         get => _lastName;
         set
         {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Прізвище не може бути порожнім.", nameof(LastName));
-            if (value.Length > 50)
-                throw new ArgumentException("Прізвище не може бути довшим за 50 символів.", nameof(LastName));
+            ClinicValidator.ValidateName(value, nameof(LastName));
             _lastName = value;
         }
     }

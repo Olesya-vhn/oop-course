@@ -130,16 +130,33 @@ static void RunPatientMenu(PatientManager manager)
                 manager.DisplayAll();
                 break;
             case "2":
-                Console.Write("Ім'я: ");
-                string fn = Console.ReadLine() ?? "";
-                Console.Write("Прізвище: ");
-                string ln = Console.ReadLine() ?? "";
-                Console.WriteLine("Оберіть групу крові (0 - Unknown, 1 - APositive, 2 - ANegative, 3 - BPositive, 4 - BNegative, 5 - ABPositive, 6 - ABNegative, 7 - OPositive, 8 - ONegative): ");
-                Console.Write("Номер: ");
-                int.TryParse(Console.ReadLine(), out int btIndex);
-                BloodType bt = (BloodType)btIndex;
-                manager.Add(new Patient(fn, ln, DateTime.Today.AddYears(-20), bt, "0000000000"));
-                break;
+                {
+                    try
+                    {
+                        Console.Write("Ім'я: ");
+                        string fn = Console.ReadLine() ?? "";
+                        Console.Write("Прізвище: ");
+                        string ln = Console.ReadLine() ?? "";
+                        Console.Write("Телефон (10 цифр): ");
+                        string phone = Console.ReadLine() ?? "";
+                        Console.WriteLine("Оберіть групу крові (0 - Unknown, 1 - APositive, 2 - ANegative, 3 - BPositive, 4 - BNegative, 5 - ABPositive, 6 - ABNegative, 7 - OPositive, 8 - ONegative): ");
+                        Console.Write("Номер: ");
+                        int.TryParse(Console.ReadLine(), out int btIndex);
+                        if (!Enum.IsDefined(typeof(BloodType), btIndex))
+                            throw new ArgumentException("Невідома група крові.", nameof(btIndex));
+
+                        manager.Add(new Patient(fn, ln, DateTime.Today.AddYears(-20), (BloodType)btIndex, phone));
+                    }
+                    catch (ArgumentOutOfRangeException e)
+                    {
+                        Console.WriteLine($"Помилка: {e.Message}");
+                    }
+                    catch (ArgumentException e)
+                    {
+                        Console.WriteLine($"Помилка: {e.Message}");
+                    }
+                    break;
+                }
             case "3":
                 Console.Write("Пошуковий запит: ");
                 string q = Console.ReadLine() ?? "";
@@ -170,6 +187,7 @@ static void RunDoctorMenu(DoctorManager manager)
         Console.WriteLine("1. Показати всіх");
         Console.WriteLine("2. Пошук за спеціальністю");
         Console.WriteLine("3. Статистика");
+        Console.WriteLine("4. Додати лікаря");
         Console.WriteLine("0. Назад");
         Console.Write("Ваш вибір: ");
 
@@ -191,6 +209,42 @@ static void RunDoctorMenu(DoctorManager manager)
             case "3":
                 manager.DisplayStats();
                 break;
+            case "4":
+                {
+                    try
+                    {
+                        Console.Write("Ім'я: ");
+                        string fn = Console.ReadLine() ?? "";
+                        Console.Write("Прізвище: ");
+                        string ln = Console.ReadLine() ?? "";
+
+                        foreach (Speciality s in Enum.GetValues(typeof(Speciality)))
+                            Console.WriteLine($"{(int)s} - {s}");
+                        Console.Write("Номер спеціальності: ");
+                        int.TryParse(Console.ReadLine(), out int specIndex);
+                        if (!Enum.IsDefined(typeof(Speciality), specIndex))
+                            throw new ArgumentException("Невідома спеціальність.", nameof(specIndex));
+
+                        Console.Write("Початок роботи (година, 0-23): ");
+                        int.TryParse(Console.ReadLine(), out int start);
+                        Console.Write("Кінець роботи (година, 1-24): ");
+                        int.TryParse(Console.ReadLine(), out int end);
+                        Console.Write("Кабінет: ");
+                        string room = Console.ReadLine() ?? "";
+
+                        WorkSchedule schedule = new WorkSchedule(start, end);
+                        manager.Add(new Doctor(fn, ln, (Speciality)specIndex, schedule, room));
+                    }
+                    catch (ArgumentOutOfRangeException e)
+                    {
+                        Console.WriteLine($"Помилка: {e.Message}");
+                    }
+                    catch (ArgumentException e)
+                    {
+                        Console.WriteLine($"Помилка: {e.Message}");
+                    }
+                    break;
+                }
         }
     }
 }
@@ -219,21 +273,37 @@ static void RunAppointmentMenu(AppointmentManager appManager, PatientManager pMa
                 appManager.DisplayList(appManager.GetByDate(DateTime.Today));
                 break;
             case "3":
-                Console.WriteLine("\nСписок пацієнтів:");
-                pManager.DisplayAll();
-                Console.Write("ID пацієнта: ");
-                int.TryParse(Console.ReadLine(), out int pId);
+                {
+                    try
+                    {
+                        Console.WriteLine("\nСписок пацієнтів:");
+                        pManager.DisplayAll();
+                        Console.Write("ID пацієнта: ");
+                        int.TryParse(Console.ReadLine(), out int pId);
 
-                Console.WriteLine("\nСписок лікарів:");
-                dManager.DisplayAll();
-                Console.Write("ID лікаря: ");
-                int.TryParse(Console.ReadLine(), out int dId);
+                        Console.WriteLine("\nСписок лікарів:");
+                        dManager.DisplayAll();
+                        Console.Write("ID лікаря: ");
+                        int.TryParse(Console.ReadLine(), out int dId);
 
-                Console.Write("Година прийому сьогодні (0-23): ");
-                int.TryParse(Console.ReadLine(), out int h);
+                        Console.Write("Година прийому сьогодні (0-23): ");
+                        int.TryParse(Console.ReadLine(), out int h);
 
-                appManager.Book(pId, dId, DateTime.Today.AddHours(h), 30);
-                break;
+                        Console.Write("Тривалість (хвилин): ");
+                        int.TryParse(Console.ReadLine(), out int duration);
+
+                        appManager.Book(pId, dId, DateTime.Today.AddHours(h), duration);
+                    }
+                    catch (ArgumentOutOfRangeException e)
+                    {
+                        Console.WriteLine($"Помилка: {e.Message}");
+                    }
+                    catch (ArgumentException e)
+                    {
+                        Console.WriteLine($"Помилка: {e.Message}");
+                    }
+                    break;
+                }
             case "4":
                 Console.Write("ID запису для скасування: ");
                 if (int.TryParse(Console.ReadLine(), out int appId))

@@ -19,10 +19,7 @@ public class Patient
         get => _firstName;
         set
         {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Ім'я не може бути порожнім.", nameof(FirstName));
-            if (value.Length > 50)
-                throw new ArgumentException("Ім'я не може бути довшим за 50 символів.", nameof(FirstName));
+            ClinicValidator.ValidateName(value, nameof(FirstName));
             _firstName = value;
         }
     }
@@ -32,47 +29,35 @@ public class Patient
         get => _lastName;
         set
         {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Прізвище не може бути порожнім.", nameof(LastName));
-            if (value.Length > 50)
-                throw new ArgumentException("Прізвище не може бути довшим за 50 символів.", nameof(LastName));
+            ClinicValidator.ValidateName(value, nameof(LastName));
             _lastName = value;
         }
     }
-
-
 
     public DateTime BirthDate
     {
         get => _birthDate;
         set
         {
-            if (value.Date > DateTime.Today)
-                throw new ArgumentOutOfRangeException(nameof(BirthDate), "Дата народження не може бути в майбутньому.");
-            if (value.Year < 1900)
-                throw new ArgumentOutOfRangeException(nameof(BirthDate), "Дата народження не може бути раніше 1900 року.");
+            ClinicValidator.ValidateDate(value, nameof(BirthDate));
             _birthDate = value;
         }
     }
-
-    public BloodType BloodType { get; set; }
-
 
     public string Phone
     {
         get => _phone;
         set
         {
-            if (value == null || value.Length != 10)
-                throw new ArgumentException("Телефон має містити рівно 10 символів.", nameof(Phone));
-            foreach (char c in value)
-            {
-                if (c < '0' || c > '9')
-                    throw new ArgumentException("Телефон має містити лише цифри.", nameof(Phone));
-            }
+            ClinicValidator.ValidatePhone(value);
             _phone = value;
         }
     }
+
+    public BloodType BloodType { get; set; }
+
+
+    
     public int Age
     {
         get
