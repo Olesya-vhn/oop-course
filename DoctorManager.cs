@@ -50,6 +50,16 @@ public class DoctorManager
         return doctor != null;
     }
 
+    public Doctor[] GetAll()
+    {
+        Doctor[] result = new Doctor[_count];
+        for (int i = 0; i < _count; i++)
+        {
+            result[i] = _doctors[i];
+        }
+        return result;
+    }
+
     public Doctor[] FindBySpeciality(string query)
     {
         string q = (query ?? "").Trim().ToLower();
@@ -142,6 +152,35 @@ public class DoctorManager
         for (int i = 0; i < _count; i++)
         {
             Console.WriteLine(_doctors[i]);
+        }
+    }
+
+    public void DisplayStats()
+    {
+        Console.WriteLine("=== Статистика лікарів ===");
+        if (_count == 0)
+        {
+            Console.WriteLine("Список лікарів порожній.");
+            return;
+        }
+
+        Console.WriteLine($"Усього: {_count}");
+
+        foreach (Speciality spec in Enum.GetValues(typeof(Speciality)))
+        {
+            int specCount = 0;
+            for (int i = 0; i < _count; i++)
+            {
+                if (_doctors[i].Speciality == spec)
+                {
+                    specCount++;
+                }
+            }
+
+            if (specCount > 0)
+            {
+                Console.WriteLine($"{ClinicFormatter.FormatSpeciality(spec)}: {specCount}");
+            }
         }
     }
 }
