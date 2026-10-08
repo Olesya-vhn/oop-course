@@ -20,11 +20,11 @@ WorkSchedule evening = new WorkSchedule(14, 22);
 WorkSchedule copy = morning;
 copy = new WorkSchedule(9, 17);
 
-clinic.Doctors.Add(new Doctor("Денис", "Захарченко", Speciality.Cardiology, morning, "201"));
-clinic.Doctors.Add(new Doctor("Ірина", "Гончарук", Speciality.Pediatrics, evening, "202"));
-clinic.Doctors.Add(new Doctor("Павло", "Марченко", Speciality.Neurology, morning, "203"));
-clinic.Doctors.Add(new Doctor("Олена", "Яковенко", Speciality.Dermatology, evening, "204"));
-clinic.Doctors.Add(new Doctor("Святослав", "Білоус", Speciality.General, morning, "205"));
+clinic.Doctors.Add(new Doctor("Денис", "Захарченко", Speciality.Cardiology, morning, "201", "AB123456", "0501112233"));
+clinic.Doctors.Add(new Doctor("Ірина", "Гончарук", Speciality.Pediatrics, evening, "202", "AB234567", "0672223344"));
+clinic.Doctors.Add(new Doctor("Павло", "Марченко", Speciality.Neurology, morning, "203", "AB345678", "0633334455"));
+clinic.Doctors.Add(new Doctor("Олена", "Яковенко", Speciality.Dermatology, evening, "204", "AB456789", "0974445566"));
+clinic.Doctors.Add(new Doctor("Святослав", "Білоус", Speciality.General, morning, "205", "AB567890", "0505556677"));
 
 clinic.Appointments.Book(1, 1, DateTime.Today.AddHours(9), 30);
 clinic.Appointments.Book(2, 2, DateTime.Today.AddHours(15), 30);
@@ -231,9 +231,13 @@ static void RunDoctorMenu(DoctorManager manager)
                         int.TryParse(Console.ReadLine(), out int end);
                         Console.Write("Кабінет: ");
                         string room = Console.ReadLine() ?? "";
+                        Console.Write("Номер ліцензії: ");
+                        string license = Console.ReadLine() ?? "";
+                        Console.Write("Телефон (10 цифр): ");
+                        string docPhone = Console.ReadLine() ?? "";
 
                         WorkSchedule schedule = new WorkSchedule(start, end);
-                        manager.Add(new Doctor(fn, ln, (Speciality)specIndex, schedule, room));
+                        manager.Add(new Doctor(fn, ln, (Speciality)specIndex, schedule, room, license, docPhone));
                     }
                     catch (ArgumentOutOfRangeException e)
                     {
