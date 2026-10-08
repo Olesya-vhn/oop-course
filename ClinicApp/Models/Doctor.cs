@@ -6,14 +6,33 @@ public class Doctor
 {
     private static int _nextId = 1;
 
+    private string _firstName = "";
+    private string _lastName = "";
+    private string _roomNumber = "";
+    public string FullName => $"{FirstName} {LastName}";
+
     public int Id { get; }
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
+
+    public string FirstName
+    {
+        get => _firstName;
+        set => _firstName = value;
+    }
+
+    public string LastName
+    {
+        get => _lastName;
+        set => _lastName = value;
+    }
+
     public Speciality Speciality { get; set; }
     public WorkSchedule Schedule { get; set; }
-    public string RoomNumber { get; set; }
 
-    public string FullName => $"{FirstName} {LastName}";
+    public string RoomNumber
+    {
+        get => _roomNumber;
+        set => _roomNumber = value;
+    }
 
     public bool IsAvailableNow => Schedule.IsNow;
 
