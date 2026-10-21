@@ -1,3 +1,4 @@
+using ClinicApp.Interfaces;
 using ClinicApp.Enums;
 using ClinicApp.Models;
 namespace ClinicApp.Managers;
@@ -197,7 +198,18 @@ public class AppointmentManager
         }
         return result;
     }
-
+    public static int CancelAll(ICancellable[] items, string reason = "")
+    {
+        int cancelled = 0;
+        for (int i = 0; i < items.Length; i++)
+        {
+            if (items[i].Cancel(reason))
+            {
+                cancelled++;
+            }
+        }
+        return cancelled;
+    }
     public void DisplayAppointment(Appointment app)
     {
         Patient? patient = _patients.FindById(app.PatientId);
