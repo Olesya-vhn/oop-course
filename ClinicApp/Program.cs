@@ -33,6 +33,8 @@ clinic.Doctors.Add(new Doctor("Святослав", "Білоус", Speciality.G
 clinic.Appointments.Book(1, 1, DateTime.Today.AddHours(9), 30);
 clinic.Appointments.Book(2, 2, DateTime.Today.AddHours(15), 30);
 clinic.Appointments.Book(3, 3, DateTime.Today.AddHours(11), 45);
+clinic.Appointments.BookUrgent(4, 4, DateTime.Today.AddDays(1).AddHours(10), "біль у грудях");
+clinic.Appointments.BookSpecialist(5, 5, DateTime.Today.AddDays(1).AddHours(12), "кардіологія", 60);
 
 
 
@@ -56,7 +58,26 @@ for (int i = 0; i < patientRecords.Length; i++)
     Console.WriteLine($"{patientRecords[i].GetRecordType()}: {patientRecords[i].GetSummary()}");
 }
 clinic.MedicalRecords.DisplayPatientSummary(1);
-
+UrgentAppointment urgent = new UrgentAppointment(1, 1, DateTime.Today.AddDays(1).AddHours(14), "тест");
+Appointment viaBase = urgent;   
+Console.WriteLine("\n== new vs override ==");
+Console.WriteLine($"Через Appointment:       {viaBase.GetDescription()} | пріоритет {viaBase.GetPriority()}");
+Console.WriteLine($"Через UrgentAppointment: {urgent.GetDescription()} | пріоритет {urgent.GetPriority()}");
+// 1. Чому GetDescription() через змінну типу Appointment дає опис термінового прийому?
+//    Метод віртуальний (virtual в Appointment, override в UrgentAppointment). Для таких
+//    методів реалізація обирається за ТИПОМ ОБ'ЄКТА під час виконання, а не за типом змінної.
+//    Об'єкт — UrgentAppointment, тож виконується його версія.
+//
+// 2. Чому GetPriority() через ту саму змінну повертає 3, хоча об'єкт — UrgentAppointment?
+//    У Appointment метод не virtual, а в UrgentAppointment він лише ПРИХОВАНИЙ через new.
+//    Приховані методи обираються за ТИПОМ ЗМІННОЇ ще під час компіляції. Змінна має тип
+//    Appointment, тому викликається версія батька (3). Через UrgentAppointment — версія
+//    підкласу (1).
+//
+// 3. Що змінити, щоб GetPriority() теж працював поліморфно?
+//    В Appointment зробити метод virtual: public virtual int GetPriority(),
+//    а в UrgentAppointment замінити new на override: public override int GetPriority().
+//    Тоді обидві змінні дадуть 1.
 RunMainMenu(clinic);
 
 static void PrintBoxLine(string text)
