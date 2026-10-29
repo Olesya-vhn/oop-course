@@ -47,9 +47,21 @@ public class Appointment : IPayable, ICancellable
     
     public bool IsPaid => _isPaid;
 
+    // Варіант А: множник знижки живе в базовому класі Appointment.
+    // Обрано його, бо знижка діє на ВСІ типи прийому одразу, а підкласи
+    // (Urgent, Specialist) і далі беруть ціну через base.GetCost(), тож їх
+    // не потрібно змінювати. Нові тарифи (дитячий, пенсійний) додаються
+    // без нових класів.
+    public decimal DiscountMultiplier { get; private set; } = 1m;
+
+    public void ApplyVipDiscount()
+    {
+        DiscountMultiplier = 0.8m;
+    }
+
     public virtual decimal GetCost()
     {
-        return DurationMinutes * 10m;
+        return DurationMinutes * 10m * DiscountMultiplier;
     }
     public virtual string GetDescription()
     {
