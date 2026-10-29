@@ -329,6 +329,7 @@ static void RunAppointmentMenu(AppointmentManager appManager, PatientManager pMa
         Console.WriteLine("3. Створити запис");
         Console.WriteLine("4. Скасувати запис");
         Console.WriteLine("8. Скасувати всі записи пацієнта");
+        Console.WriteLine("9. За типом прийому");
         Console.WriteLine("0. Назад");
         Console.Write("Ваш вибір: ");
 
@@ -397,10 +398,36 @@ static void RunAppointmentMenu(AppointmentManager appManager, PatientManager pMa
                     int cancelled = AppointmentManager.CancelAll(appManager.GetByPatient(cancelPatientId), cancelReason);
                     Console.WriteLine($"Скасовано записів: {cancelled}");
                     break;
+               }
+            case "9":
+                {
+                    Console.WriteLine("  1. Термінові");
+                    Console.WriteLine("  2. Консультації спеціаліста");
+                    Console.WriteLine("  3. Звичайні");
+                    Console.Write("Оберіть: ");
+
+                    string? typeChoice = Console.ReadLine();
+                    switch (typeChoice)
+                    {
+                        case "1":
+                            appManager.DisplayList(appManager.GetUrgent());
+                            break;
+                        case "2":
+                            appManager.DisplayList(appManager.GetSpecialist());
+                            break;
+                        case "3":
+                            appManager.DisplayList(appManager.GetRegular());
+                            break;
+                        default:
+                            Console.WriteLine("Невідомий вибір.");
+                            break;
+                    }
+                    break;
                 }
         }
     }
 }
+
     static void RunMedicalRecordsMenu(Clinic clinic)
     {
         while (true)

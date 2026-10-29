@@ -211,6 +211,77 @@ public class AppointmentManager
         }
         return result;
     }
+    public Appointment[] GetUrgent()
+    {
+        int matchCount = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is UrgentAppointment)
+            {
+                matchCount++;
+            }
+        }
+
+        Appointment[] result = new Appointment[matchCount];
+        int index = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is UrgentAppointment)
+            {
+                result[index] = _appointments[i];
+                index++;
+            }
+        }
+        return result;
+    }
+
+    public Appointment[] GetSpecialist()
+    {
+        int matchCount = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is SpecialistAppointment)
+            {
+                matchCount++;
+            }
+        }
+
+        Appointment[] result = new Appointment[matchCount];
+        int index = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is SpecialistAppointment)
+            {
+                result[index] = _appointments[i];
+                index++;
+            }
+        }
+        return result;
+    }
+
+    public Appointment[] GetRegular()
+    {
+        int matchCount = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is RegularAppointment)
+            {
+                matchCount++;
+            }
+        }
+
+        Appointment[] result = new Appointment[matchCount];
+        int index = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is RegularAppointment)
+            {
+                result[index] = _appointments[i];
+                index++;
+            }
+        }
+        return result;
+    }
     public static int CancelAll(ICancellable[] items, string reason = "")
     {
         int cancelled = 0;
@@ -231,11 +302,12 @@ public class AppointmentManager
         string patientName = patient != null ? patient.FullName : $"Пацієнт #{app.PatientId}";
         string doctorName = doctor != null ? doctor.FullName : $"Лікар #{app.DoctorId}";
 
-        string line = $"[{app.Id}] {patientName} \u2192 {doctorName} | {app.ScheduledAt:dd.MM.yyyy HH:mm}-{app.EndsAt:HH:mm} | {app.Status}";
+        string line = $"[{app.Id}] {app.GetDescription()} | {patientName} \u2192 {doctorName} | {app.ScheduledAt:dd.MM.yyyy HH:mm}\u2013{app.EndsAt:HH:mm} | {app.Status}";
         if (app.Notes.Length > 0)
         {
             line += $" | {app.Notes}";
         }
+        line += $" | {app.GetCost():F2} грн";
         Console.WriteLine(line);
     }
 
