@@ -11,6 +11,7 @@ public class Clinic
     public AppointmentManager Appointments { get; }
     public MedicalRecordManager MedicalRecords { get; }
     public BillingManager Billing { get; }
+    public WaitingQueue<Patient> WaitingRoom { get; }
 
 
     public Clinic(string name)
@@ -21,6 +22,7 @@ public class Clinic
         Appointments = new AppointmentManager(Patients, Doctors);
         Billing = new BillingManager(Appointments);
         MedicalRecords = new MedicalRecordManager();
+        WaitingRoom = new WaitingQueue<Patient>();
     }
 
     public void DisplaySchedule(DateTime date)
