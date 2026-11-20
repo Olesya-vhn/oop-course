@@ -17,3 +17,6 @@ desktop.ini
 *.env
 appsettings.Development.json
 secrets.json
+*.log
+reports/
+session.dat
