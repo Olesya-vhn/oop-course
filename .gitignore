@@ -18,3 +18,4 @@ desktop.ini
 appsettings.Development.json
 secrets.json
 *.log
+reports/
