@@ -80,7 +80,26 @@ Console.WriteLine($"Через UrgentAppointment: {urgent.GetDescription()} | п
 //    В Appointment зробити метод virtual: public virtual int GetPriority(),
 //    а в UrgentAppointment замінити new на override: public override int GetPriority().
 //    Тоді обидві змінні дадуть 1.
+if (clinic.Session.Exists())
+{
+    Console.Write("Знайдено збережену сесію. Завантажити? (y/n): ");
+    if ((Console.ReadLine() ?? "").Trim().ToLower() == "y")
+    {
+        int loaded = clinic.Session.Load(clinic);
+        Console.WriteLine($"Завантажено {loaded} пацієнтів.");
+        clinic.Logger.LogInfo($"Завантажено сесію: {loaded} пацієнтів");
+    }
+}
+
 RunMainMenu(clinic);
+
+Console.Write("Зберегти сесію? (y/n): ");
+if ((Console.ReadLine() ?? "").Trim().ToLower() == "y")
+{
+    clinic.Session.Save(clinic);
+    Console.WriteLine("Сесію збережено.");
+    clinic.Logger.LogInfo("Сесію збережено");
+}
 
 static void PrintBoxLine(string text)
 {
