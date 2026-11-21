@@ -20,3 +20,4 @@ secrets.json
 *.log
 reports/
 session.dat
+alerts/
