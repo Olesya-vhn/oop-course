@@ -6,6 +6,7 @@ using ClinicApp.Managers;
 using ClinicApp.Interfaces;
 using ClinicApp.Comparators;
 using ClinicApp.Utils;
+using ClinicApp.Events;
 
 Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
@@ -13,6 +14,7 @@ Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
 Clinic clinic = new Clinic("Медичний Центр «Здоров'я»");
+clinic.Appointments.AppointmentBooked += OnAppointmentBookedConsole;
 DateTime today = DateTime.Today;
 
 clinic.Patients.Add(new Patient("Ярослав", "Кравченко", today.AddYears(-38), BloodType.APositive, "0631234567"));
@@ -1050,4 +1052,8 @@ static void RunFilesMenu(Clinic clinic)
 
 
     }
+}
+static void OnAppointmentBookedConsole(object? sender, AppointmentEventArgs e)
+{
+    Console.WriteLine($"  [EVENT] Запис #{e.AppointmentId} створено: пацієнт #{e.PatientId} → лікар #{e.DoctorId}, {e.ScheduledAt:dd.MM.yyyy HH:mm}");
 }

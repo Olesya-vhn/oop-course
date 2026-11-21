@@ -1,6 +1,7 @@
 using ClinicApp.Interfaces;
 using ClinicApp.Enums;
 using ClinicApp.Models;
+using ClinicApp.Events;
 namespace ClinicApp.Managers;
 
 public class AppointmentManager
@@ -12,6 +13,8 @@ public class AppointmentManager
     private DoctorManager _doctors;
 
     public int Count => _count;
+
+    public event EventHandler<AppointmentEventArgs>? AppointmentBooked;
 
     public Appointment this[int index]
     {
@@ -80,8 +83,10 @@ public class AppointmentManager
 
         _appointments[_count] = app;
         _count++;
+        AppointmentBooked?.Invoke(this, new AppointmentEventArgs(app.Id, app.PatientId, app.DoctorId, app.ScheduledAt, app.Notes));
         return true;
-    }
+    
+}
     public bool Cancel(int id, string reason = "")
     {
         Appointment? app = FindById(id);
