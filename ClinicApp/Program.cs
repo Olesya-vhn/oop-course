@@ -6,6 +6,7 @@ using ClinicApp.Managers;
 using ClinicApp.Interfaces;
 using ClinicApp.Comparators;
 using ClinicApp.Utils;
+using ClinicApp.Events;
 
 Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
@@ -13,6 +14,7 @@ Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
 Clinic clinic = new Clinic("Медичний Центр «Здоров'я»");
+clinic.Appointments.AppointmentBooked += OnAppointmentBookedConsole;
 DateTime today = DateTime.Today;
 
 clinic.Patients.Add(new Patient("Ярослав", "Кравченко", today.AddYears(-38), BloodType.APositive, "0631234567"));
@@ -92,6 +94,8 @@ if (clinic.Session.Exists())
 }
 
 RunMainMenu(clinic);
+clinic.Tracker.PrintSummary();
+clinic.Tracker.SaveSummary();
 
 Console.Write("Зберегти сесію? (y/n): ");
 if ((Console.ReadLine() ?? "").Trim().ToLower() == "y")
@@ -205,7 +209,7 @@ static void RunPatientMenu(PatientManager manager, ClinicLogger logger)
 
                         Patient newPatient = new Patient(fn, ln, DateTime.Today.AddYears(-20), (BloodType)btIndex, phone);
                         manager.Add(newPatient);
-                        logger.LogInfo($"Додано пацієнта #{newPatient.Id}: {newPatient.FullName}");
+                        
                     }
                     catch (ArgumentOutOfRangeException e)
                     {
@@ -408,10 +412,7 @@ static void RunAppointmentMenu(AppointmentManager appManager, PatientManager pMa
 
                         Console.Write("Тривалість (хвилин): ");
                         int.TryParse(Console.ReadLine(), out int duration);
-                        if (appManager.Book(pId, dId, DateTime.Today.AddHours(h), duration))
-                        {
-                            logger.LogInfo($"Запис створено: пацієнт #{pId} → лікар #{dId}");
-                        }
+                        appManager.Book(pId, dId, DateTime.Today.AddHours(h), duration);
                     }
                     catch (ArgumentOutOfRangeException e)
                     {
@@ -434,7 +435,6 @@ static void RunAppointmentMenu(AppointmentManager appManager, PatientManager pMa
                     if (appManager.Cancel(appId, reason))
                     {
                         Console.WriteLine("Запис успішно скасовано.");
-                        logger.LogInfo($"Запис #{appId} скасовано. Причина: {reason}");
                     }
                     else Console.WriteLine("Не вдалося скасувати запис.");
                 }
@@ -448,9 +448,9 @@ static void RunAppointmentMenu(AppointmentManager appManager, PatientManager pMa
                     Console.Write("Причина (Enter — без причини): ");
                     string cancelReason = Console.ReadLine() ?? "";
 
-                    int cancelled = AppointmentManager.CancelAll(appManager.GetByPatient(cancelPatientId), cancelReason);
+                    int cancelled = appManager.CancelAll(appManager.GetByPatient(cancelPatientId), cancelReason);
                     Console.WriteLine($"Скасовано записів: {cancelled}");
-                    logger.LogInfo($"Скасовано записів пацієнта #{cancelPatientId}: {cancelled}");
+                    
                     break;
                }
             case "9":
@@ -727,11 +727,10 @@ static void RunAppointmentMenu(AppointmentManager appManager, PatientManager pMa
                     if (clinic.Billing.PayAppointment(payId))
                     {
                         Console.WriteLine($"Запис [{payId}] оплачено.");
-                        clinic.Logger.LogInfo($"Запис #{payId} оплачено");
                     }
                     else
                         Console.WriteLine("Не вдалося оплатити: запис не знайдено, вже оплачено або скасовано.");
-                        break;
+                    break;
                     }
                 case "4":
                     Console.WriteLine($"Загальний борг по клініці: {clinic.Billing.GetTotalDebt():F2} грн");
@@ -945,9 +944,8 @@ static void RunTreatmentPlansMenu(Clinic clinic)
                 {
                     if (!AskInt("ID плану: ", out int completeId))
                         break;
-                    TreatmentPlan? plan = clinic.TreatmentPlans.GetById(completeId);
-                    if (plan == null) Console.WriteLine("План не знайдено.");
-                    else if (plan.Complete()) Console.WriteLine("План завершено.");
+                    if (clinic.TreatmentPlans.GetById(completeId) == null) Console.WriteLine("План не знайдено.");
+                    else if (clinic.TreatmentPlans.Complete(completeId)) Console.WriteLine("План завершено.");
                     else Console.WriteLine("Неможливо завершити: завершити можна лише активний план.");
                     break;
                 }
@@ -1050,4 +1048,8 @@ static void RunFilesMenu(Clinic clinic)
 
 
     }
+}
+static void OnAppointmentBookedConsole(object? sender, AppointmentEventArgs e)
+{
+    Console.WriteLine($"  [EVENT] Запис #{e.AppointmentId} створено: пацієнт #{e.PatientId} → лікар #{e.DoctorId}, {e.ScheduledAt:dd.MM.yyyy HH:mm}");
 }
