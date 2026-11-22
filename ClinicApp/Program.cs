@@ -94,6 +94,8 @@ if (clinic.Session.Exists())
 }
 
 RunMainMenu(clinic);
+clinic.Tracker.PrintSummary();
+clinic.Tracker.SaveSummary();
 
 Console.Write("Зберегти сесію? (y/n): ");
 if ((Console.ReadLine() ?? "").Trim().ToLower() == "y")
